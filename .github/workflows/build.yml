@@ -8,7 +8,11 @@ jobs:
     name: Fetch Build Keyboards
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
+      build-time: ${{ steps.set-build-time.outputs.build-time }}
     steps:
+      - id: set-build-time
+        name: Set Build Time
+        run: echo ::set-output name=build-time::$(date "+%Y-%m-%d %H.%M.%S")
       - name: Checkout
         uses: actions/checkout@v2
       - name: Install yaml2json
@@ -19,7 +23,6 @@ jobs:
           matrix=$(yaml2json build.yaml | jq -c .)
           yaml2json build.yaml
           echo "::set-output name=matrix::${matrix}"
-          echo ::set-output name=build-time::$(date "+%Y-%m-%d %H.%M.%S")
 
   build:
     runs-on: ubuntu-latest
