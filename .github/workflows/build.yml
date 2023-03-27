@@ -19,6 +19,8 @@ jobs:
           matrix=$(yaml2json build.yaml | jq -c .)
           yaml2json build.yaml
           echo "::set-output name=matrix::${matrix}"
+          echo ::set-output name=build-time::$(date "+%Y-%m-%d %H.%M.%S")
+
   build:
     runs-on: ubuntu-latest
     container:
@@ -41,7 +43,6 @@ jobs:
             DISPLAY_NAME="${{ matrix.board }}"
             ARTIFACT_NAME="${{ matrix.board }}-zmk"
           fi
-          echo ::set-output name=build-time::$(date "+%Y-%m-%d %H.%M.%S")
           echo ::set-output name=extra-cmake-args::${EXTRA_CMAKE_ARGS}
           echo ::set-output name=artifact-name::${ARTIFACT_NAME}
           echo ::set-output name=display-name::${DISPLAY_NAME}
@@ -87,5 +88,5 @@ jobs:
       - name: Archive (${{ steps.variables.outputs.display-name }})
         uses: actions/upload-artifact@v2
         with:
-          name: firmware-${{ steps.variables.outputs.build-time }}
+          name: firmware-${{ needs.matrix.outputs.build-time }}
           path: build/artifacts
